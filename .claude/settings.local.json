@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem \"D:\\\\Random Projects\\\\Sovereign Tattoo\\\\Tattoo Project\" -File | Where-Object {$_.Name -match '\\\\\\(2\\\\\\)'})",
+      "Bash(python src/sv_compress.py)",
+      "Bash(python -c \"import sys; sys.path.insert\\(0,'src'\\); from sv_api import SovereignApi; api = SovereignApi\\(\\); print\\(api.ping\\(\\)\\); print\\('find_lpaq:', api.find_lpaq\\(\\)\\); print\\('settings ok:', api.get_settings\\(\\)['ok']\\)\")",
+      "Bash(python -c ' *)",
+      "Bash(python src/sv_engines.py)",
+      "Bash(python -c \"import sys; sys.path.insert\\(0,'src'\\); import sv_api; print\\('Import OK'\\)\")",
+      "Bash(python src/sv_bridge.py)",
+      "Bash(tokensave sync *)",
+      "PowerShell(tokensave sync)",
+      "PowerShell(tokensave upgrade)",
+      "PowerShell(Get-ChildItem \".tokensave\" -ErrorAction SilentlyContinue; if \\(Test-Path \"$env:LOCALAPPDATA\\\\tokensave\"\\) { Get-ChildItem \"$env:LOCALAPPDATA\\\\tokensave\" }; where.exe tokensave 2>$null)",
+      "Bash(python -c \"import sys; sys.path.insert\\(0,'src'\\); from sv_api import SovereignApi; api = SovereignApi\\(\\); print\\(api.ping\\(\\)\\); print\\([m for m in dir\\(api\\) if not m.startswith\\('_'\\)]\\)\")",
+      "Bash(\"/c/Users/pmpd/AppData/Roaming/Python/Python313/Scripts/tokensave.exe\" sync *)",
+      "Bash(dir \"D:\\\\Random Projects\\\\Sovereign Tattoo\\\\Tattoo Project\\\\scripts\")",
+      "Bash(dir \"D:\\\\Random Projects\\\\Sovereign Tattoo\\\\Tattoo Project\" /b)",
+      "Bash(dir \"D:\\\\Random Projects\\\\Sovereign Tattoo\\\\Tattoo Project\\\\legacy\" /s /b)"
+    ]
+  }
+}

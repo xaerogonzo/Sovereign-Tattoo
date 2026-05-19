@@ -1,0 +1,12 @@
+# Sovereign Tattoo — Python dependencies
+#
+# Runtime requirements:
+pywebview>=5,<6        # Edge WebView2 embedding for the GUI shell
+keyring>=24            # Windows Credential Manager wrapper
+Pillow>=10             # PNG export in the Tattoo Studio + image manipulation
+
+# Optional — only needed if you want Tesseract OCR in the Tattoo tab.
+# The Tesseract binary itself must be installed separately from
+# https://github.com/UB-Mannheim/tesseract/wiki (Windows installer).
+# Configure its path in the Settings tab if it isn't on PATH.
+pytesseract>=0.3.13    # OCR adapter (Phase B3)

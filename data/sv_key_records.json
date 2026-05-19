@@ -1,0 +1,48 @@
+{
+  "records": {
+    "47c241fd": {
+      "id": "47c241fd",
+      "label": "",
+      "header_mode": "fullsv1",
+      "alphabet_id": "b32",
+      "alphabet_name": "Base 32",
+      "alphabet_fingerprint": "2fd67e69",
+      "alphabet_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
+      "base": 32,
+      "encryption": "aes256cbc-kv",
+      "salt_hex": "531aaa0f284689f2488c0cad6712fe17",
+      "iv_hex": "6e30e4887c25d7a96c85e5239c51397e",
+      "kdf": "pbkdf2-sha256",
+      "kdf_iterations": 100000,
+      "original_size_bytes": 5,
+      "original_sha256": "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969",
+      "encoded_string": "SV1|fp:2fd67e69|b:32|FJ45GRV4POSE7TMG6AAZBJJBQI",
+      "char_count": 47,
+      "source": "text",
+      "openssl_cli": "openssl aes-256-cbc -d -nosalt \\\n    -K <derive: PBKDF2-HMAC-SHA256(password, salt_hex, iterations, 32)> \\\n    -iv 6e30e4887c25d7a96c85e5239c51397e \\\n    -in encrypted.bin -out recovered_file",
+      "created": "2026-05-16 00:48:39"
+    },
+    "ac11e242": {
+      "id": "ac11e242",
+      "label": "",
+      "header_mode": "bare",
+      "alphabet_id": "b32",
+      "alphabet_name": "Base 32",
+      "alphabet_fingerprint": "2fd67e69",
+      "alphabet_chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
+      "base": 32,
+      "encryption": "aes256cbc-kv",
+      "salt_hex": "f7306d66003f6558d0652e36d4764de7",
+      "iv_hex": "98db5d2239b5280f433b96249505d348",
+      "kdf": "pbkdf2-sha256",
+      "kdf_iterations": 100000,
+      "original_size_bytes": 5,
+      "original_sha256": "185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969",
+      "encoded_string": "BJDKWFZYPL5QGV3HQ4P3XQAH7I",
+      "char_count": 26,
+      "source": "text",
+      "openssl_cli": "openssl aes-256-cbc -d -nosalt \\\n    -K <derive: PBKDF2-HMAC-SHA256(password, salt_hex, iterations, 32)> \\\n    -iv 98db5d2239b5280f433b96249505d348 \\\n    -in encrypted.bin -out recovered_file",
+      "created": "2026-05-16 00:48:49"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+﻿{
+    "mcpServers":  {
+                       "tokensave":  {
+                                         "args":  [
+                                                      "serve",
+                                                      "--path",
+                                                      "D:\\Random Projects\\Sovereign Tattoo\\Tattoo Project"
+                                                  ],
+                                         "command":  "D:\\Claude Co worker\\Token Save\\tokensave.exe"
+                                     }
+                   }
+}

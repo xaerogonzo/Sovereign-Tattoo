@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sovereign Alphabet Editor</title>
+<style>
+:root {
+  --font-sans: system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono: 'Consolas','Courier New',monospace;
+  --color-text-primary:     #111827;
+  --color-text-secondary:   #6b7280;
+  --color-text-info:        #2563eb;
+  --color-text-warning:     #ea580c;
+  --color-background-primary:   #ffffff;
+  --color-background-secondary: #f3f4f6;
+  --color-background-info:      #eff6ff;
+  --color-border-tertiary:  #e5e7eb;
+  --color-border-secondary: #d1d5db;
+  --color-border-info:      #93c5fd;
+  --border-radius-md: 6px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); color: var(--color-text-primary); background: var(--color-background-primary); padding: 1.5rem; max-width: 900px; }
+
+.header { margin-bottom: 1.5rem; }
+.header h2 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.header p  { font-size: 13px; color: var(--color-text-secondary); }
+
+.section-label { font-size: 11px; font-weight: 600; color: var(--color-text-secondary); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; margin-top: 1.25rem; }
+
+.char-grid { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: .5rem; }
+
+.char-btn {
+  width: 38px; height: 38px;
+  border-radius: var(--border-radius-md);
+  border: 1.5px solid var(--color-border-tertiary);
+  background: var(--color-background-primary);
+  font-size: 15px; font-weight: 500; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-text-primary);
+  position: relative;
+  transition: background .1s, border-color .1s;
+}
+.char-btn:hover { border-color: var(--color-border-secondary); background: var(--color-background-secondary); }
+.char-btn.selected { background: var(--color-background-info); border-color: var(--color-border-info); color: var(--color-text-info); font-weight: 700; }
+.char-btn.warn-flag .warn-dot { display: block; }
+
+.warn-dot {
+  display: none;
+  position: absolute; top: 3px; right: 3px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--color-text-warning);
+}
+
+.stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 1.25rem; }
+.stat { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: .75rem 1rem; }
+.stat-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.stat-val { font-size: 22px; font-weight: 600; }
+
+.alphabet-preview {
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-md);
+  padding: .75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  word-break: break-all;
+  line-height: 1.8;
+  color: var(--color-text-primary);
+  min-height: 40px;
+}
+
+.size-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 1.25rem; }
+.size-table th { text-align: left; font-weight: 600; font-size: 11px; color: var(--color-text-secondary); padding: 0 8px 6px 0; border-bottom: 1.5px solid var(--color-border-tertiary); }
+.size-table td { padding: 5px 8px 5px 0; border-bottom: 1px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+.size-table tr.current td { font-weight: 700; color: var(--color-text-info); }
+
+.bar-bg   { height: 7px; border-radius: 4px; background: var(--color-border-tertiary); overflow: hidden; width: 120px; }
+.bar-fill { height: 100%; border-radius: 4px; background: var(--color-text-info); }
+
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem; }
+.btn {
+  padding: 7px 14px;
+  border-radius: var(--border-radius-md);
+  border: 1.5px solid var(--color-border-secondary);
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+.btn:hover { background: var(--color-background-secondary); }
+.btn.primary { background: var(--color-background-info); border-color: var(--color-border-info); color: var(--color-text-info); font-weight: 600; }
+
+.output-box {
+  background: var(--color-background-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 1rem;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  display: none;
+  margin-top: .75rem;
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border-tertiary);
+}
+
+.legend { display: flex; gap: 14px; margin-bottom: 1rem; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); }
+.legend-swatch { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--color-border-tertiary); }
+.legend-swatch.sel { background: var(--color-background-info); border-color: var(--color-border-info); }
+
+/* Extended Unicode symbols section */
+#ext-symbols-section { margin-top: 1.25rem; border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0; }
+#ext-symbols-section > summary {
+  list-style: none; cursor: pointer; user-select: none;
+  padding: .6rem 1rem; margin: 0;
+  display: flex; align-items: center; gap: 6px;
+  border-radius: var(--border-radius-md);
+}
+#ext-symbols-section > summary:hover { background: var(--color-background-secondary); }
+#ext-symbols-section > summary::marker,
+#ext-symbols-section > summary::-webkit-details-marker { display: none; }
+#ext-symbols-section[open] > summary { border-bottom: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-md) var(--border-radius-md) 0 0; }
+.ext-arrow { font-size: 10px; transition: transform .15s; display: inline-block; }
+#ext-symbols-section[open] .ext-arrow { transform: rotate(90deg); }
+#ext-groups-container { padding: .75rem 1rem 1rem; }
+.ext-group-label { font-size: 11px; font-weight: 600; color: var(--color-text-secondary); letter-spacing: .06em; text-transform: uppercase; margin-top: 1rem; margin-bottom: 6px; }
+.ext-group-label:first-child { margin-top: 0; }
+.custom-char-row { display: flex; align-items: center; gap: 8px; padding: .75rem 1rem; border-bottom: 1px solid var(--color-border-tertiary); flex-wrap: wrap; }
+.custom-char-input { width: 60px; height: 36px; text-align: center; font-size: 18px; border: 1.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); font-family: var(--font-sans); }
+.custom-char-input:focus { outline: none; border-color: var(--color-border-info); }
+
+.tab-row { display: flex; gap: 0; margin-bottom: 1.25rem; border-bottom: 1.5px solid var(--color-border-tertiary); }
+.tab {
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -1.5px;
+  color: var(--color-text-secondary);
+  background: none;
+  border-top: none; border-left: none; border-right: none;
+  font-family: var(--font-sans);
+}
+.tab:hover { color: var(--color-text-primary); }
+.tab.active { color: var(--color-text-info); border-bottom-color: var(--color-text-info); font-weight: 600; }
+
+.preset-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 1.25rem; }
+.preset-btn {
+  padding: 5px 12px;
+  border-radius: var(--border-radius-md);
+  border: 1.5px solid var(--color-border-tertiary);
+  background: var(--color-background-primary);
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+.preset-btn:hover { background: var(--color-background-secondary); border-color: var(--color-border-secondary); }
+
+.warn-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 1rem; cursor: pointer; user-select: none; }
+.warn-toggle input { cursor: pointer; accent-color: var(--color-text-info); width: 14px; height: 14px; }
+
+.export-note { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1rem; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h2>Sovereign alphabet editor</h2>
+  <p>Click characters to toggle them. Orange dot = legibility risk for tattoos.</p>
+</div>
+
+<div class="tab-row">
+  <button class="tab active" onclick="showTab('build',this)">Build</button>
+  <button class="tab" onclick="showTab('compare',this)">Compare</button>
+  <button class="tab" onclick="showTab('export',this)">Export</button>
+</div>
+
+<div id="tab-build">
+  <div class="section-label" style="margin-top:0">Presets</div>
+  <div class="preset-row">
+    <button class="preset-btn" onclick="loadPreset('b37')">b37 (tattoo base)</button>
+    <button class="preset-btn" onclick="loadPreset('b38')">b38 + !</button>
+    <button class="preset-btn" onclick="loadPreset('b39')">b39 + ! ^</button>
+    <button class="preset-btn" onclick="loadPreset('b39s')">b39 + / \</button>
+    <button class="preset-btn" onclick="loadPreset('b41')">b41 + ♠♣♥♦</button>
+    <button class="preset-btn" onclick="loadPreset('b58')">b58 (standard)</button>
+    <button class="preset-btn" onclick="loadPreset('b64')">b64 (standard)</button>
+    <button class="preset-btn" onclick="loadPreset('all')">Select all</button>
+    <button class="preset-btn" onclick="loadPreset('clear')">Clear all</button>
+  </div>
+
+  <label class="warn-toggle">
+    <input type="checkbox" id="show-warn" checked onchange="refresh()">
+    Show legibility risk indicators
+  </label>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch sel"></div>Selected</div>
+    <div class="legend-item"><div class="legend-swatch"></div>Available</div>
+    <div class="legend-item">
+      <div style="width:16px;height:16px;border-radius:4px;border:1.5px solid var(--color-border-tertiary);position:relative">
+        <div style="position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--color-text-warning)"></div>
+      </div>
+      Legibility risk
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:0">Uppercase letters</div>
+  <div class="char-grid" id="grid-upper"></div>
+
+  <div class="section-label">Lowercase letters</div>
+  <div class="char-grid" id="grid-lower"></div>
+
+  <div class="section-label">Digits</div>
+  <div class="char-grid" id="grid-digits"></div>
+
+  <div class="section-label">Symbols</div>
+  <div class="char-grid" id="grid-symbols"></div>
+
+  <details id="ext-symbols-section">
+    <summary>
+      <span class="ext-arrow">▶</span>
+      <span class="section-label" style="margin:0">Extended Unicode symbols</span>
+      <span style="font-size:12px;font-weight:400;color:var(--color-text-secondary);margin-left:6px">~250 chars · 20 categories</span>
+    </summary>
+    <div class="custom-char-row">
+      <input id="ext-custom-input" class="custom-char-input" type="text" maxlength="2" placeholder="∞" title="Paste or type any symbol" />
+      <button class="btn" id="ext-custom-add">Add symbol</button>
+      <span style="font-size:12px;color:var(--color-text-secondary)">Paste any character not shown below (Win+. or Character Map)</span>
+    </div>
+    <div id="ext-groups-container"></div>
+  </details>
+
+  <div class="section-label" style="margin-top:1.5rem">Stats</div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-label">Base</div><div class="stat-val" id="stat-base">0</div></div>
+    <div class="stat"><div class="stat-label">Nosalt (64B)</div><div class="stat-val" id="stat-nosalt">—</div></div>
+    <div class="stat"><div class="stat-label">Salted (80B)</div><div class="stat-val" id="stat-salt">—</div></div>
+    <div class="stat"><div class="stat-label">bits/char</div><div class="stat-val" id="stat-bits">—</div></div>
+  </div>
+
+  <div class="section-label">Current alphabet</div>
+  <div class="alphabet-preview" id="alph-preview">—</div>
+</div>
+
+<div id="tab-compare" style="display:none">
+  <table class="size-table">
+    <thead><tr>
+      <th>Name</th><th>Base</th><th>Nosalt (64B)</th><th>Salted (80B)</th><th>Density</th>
+    </tr></thead>
+    <tbody id="compare-body"></tbody>
+  </table>
+</div>
+
+<div id="tab-export" style="display:none">
+  <p class="export-note"><strong>Save to Library</strong> — Saves directly into sv_lib.json so the alphabet appears immediately in the Encode and Decode tabs. Use <strong>Download .svlib</strong> for the legacy workflow.</p>
+  <div class="actions">
+    <button class="btn primary" onclick="saveToLibrary()">Save to Library</button>
+    <button class="btn" onclick="downloadSvlib()">Download .svlib</button>
+    <button class="btn" onclick="copyAlph()">Copy alphabet string</button>
+    <button class="btn" onclick="genExport()">Generate legacy subroutines</button>
+  </div>
+  <div class="output-box" id="output-box"></div>
+</div>
+
+<script>
+const UPPER   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+const LOWER   = 'abcdefghijklmnopqrstuvwxyz'.split('')
+const DIGITS  = '0123456789'.split('')
+const SYMBOLS = [
+  '!','@','#','$','%','^','&','*','(',')',
+  '-','_','+','=','[',']','{','}','|','\\',
+  ':',';','"',"'",'<','>',',','.','?','/',
+  '~','`'
+]
+
+// Unicode symbol groups — shown in the collapsible Extended Symbols section.
+// Each entry: { label: string, chars: string[] }
+const UNICODE_GROUPS = [
+  { label: 'Card suits',
+    chars: ['♠','♣','♥','♦','♤','♡','♢','♧'] },
+  { label: 'Stars',
+    chars: ['★','☆','✦','✧','✪','✫','✬','✭','✮','✯','✰'] },
+  { label: 'Geometric — circles',
+    chars: ['●','○','◎','◉','◐','◑','◔','◕','⊙','⊚'] },
+  { label: 'Geometric — squares',
+    chars: ['■','□','▪','▫','▬','▮','▯','◼','◻','◾','◽'] },
+  { label: 'Geometric — triangles',
+    chars: ['▲','△','▼','▽','◀','◁','▶','▷','◢','◣','◤','◥'] },
+  { label: 'Geometric — diamonds',
+    chars: ['◆','◇','◈','◊','⬧','⬨','⬡','⬢','⬣'] },
+  { label: 'Arrows — cardinal',
+    chars: ['←','↑','→','↓','↔','↕'] },
+  { label: 'Arrows — diagonal',
+    chars: ['↖','↗','↘','↙','⇖','⇗','⇘','⇙'] },
+  { label: 'Arrows — double',
+    chars: ['⇐','⇑','⇒','⇓','⇦','⇧','⇨','⇩'] },
+  { label: 'Arrows — misc',
+    chars: ['↩','↪','↫','↬','↭','↮','↯','↰','↱','↲','↳','↴','↵','↶','↷'] },
+  { label: 'Greek — lowercase',
+    chars: ['α','β','γ','δ','ε','ζ','η','θ','ι','κ','λ','μ',
+            'ν','ξ','π','ρ','σ','τ','υ','φ','χ','ψ','ω'] },
+  { label: 'Greek — uppercase (visually distinct from Latin)',
+    chars: ['Γ','Δ','Θ','Λ','Ξ','Π','Σ','Φ','Χ','Ψ','Ω'] },
+  { label: 'Math & logic',
+    chars: ['∞','√','∂','∅','∈','∉','∩','∪','∑','∏','∫',
+            '≠','≈','≡','≤','≥','±','∓','∝','∇','∀','∃','∄'] },
+  { label: 'Currency',
+    chars: ['¢','£','¥','€','₿','₽','₹','₩','₪','₱','₵','₴'] },
+  { label: 'Musical',
+    chars: ['♩','♪','♫','♬','♭','♮','♯'] },
+  { label: 'Zodiac',
+    chars: ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'] },
+  { label: 'Planets & astronomy',
+    chars: ['☿','♀','♂','♃','♄','♅','♆','♇','☉','☽','☾'] },
+  { label: 'Misc symbols',
+    chars: ['☀','☁','☂','☃','☄','☎','✉','✿','❀','❁','❂',
+            '✓','✗','✝','✡','✠','✞','✟','✙','✚','✛'] },
+  { label: 'Letterlike',
+    chars: ['ℓ','ℕ','ℤ','ℝ','ℂ','ℚ','Å','Ω','™','©','®','℃','℉'] },
+  { label: 'Blocks & shading',
+    chars: ['█','▓','▒','░','▀','▄','▌','▐','▍','▎','▏'] },
+]
+
+// All Unicode chars in display order — used by getAlph() and loadPreset('all')
+const UNICODE_ALL = UNICODE_GROUPS.flatMap(g => g.chars)
+
+// Characters that look like common Latin letters/digits (legibility risk when mixed).
+// Includes Greek uppercase confusables and lowercase ο/ν.
+const WARN = new Set([
+  // ASCII legibility risks
+  '0','1','I','O','|','l','!','/','-','_','.',',','`',"'",'~',
+  '*','%','@','$','&','(',')',  '[',']','{','}',':',';','"',
+  // Greek uppercase — look identical to Latin when font varies
+  'Α','Β','Ε','Ζ','Η','Ι','Κ','Μ','Ν','Ο','Ρ','Τ','Υ',
+  // Greek lowercase confusables
+  'ο','ν',
+])
+
+// Human-readable reason for warn-dot tooltip
+const WARN_REASON = {
+  'Α': 'Looks like Latin A',  'Β': 'Looks like Latin B',
+  'Ε': 'Looks like Latin E',  'Ζ': 'Looks like Latin Z',
+  'Η': 'Looks like Latin H',  'Ι': 'Looks like Latin I',
+  'Κ': 'Looks like Latin K',  'Μ': 'Looks like Latin M',
+  'Ν': 'Looks like Latin N',  'Ο': 'Looks like Latin O',
+  'Ρ': 'Looks like Latin P',  'Τ': 'Looks like Latin T',
+  'Υ': 'Looks like Latin Y',  'ο': 'Looks like Latin o',
+  'ν': 'Looks like Latin v',
+}
+
+const PRESETS = {
+  b37:   'ABCDEFGHJKLMNPQRSTUVWXYZ23456789-_+=?',
+  b38:   'ABCDEFGHJKLMNPQRSTUVWXYZ23456789-_+=?!',
+  b39:   'ABCDEFGHJKLMNPQRSTUVWXYZ23456789-_+=?!.',
+  b39s:  'ABCDEFGHJKLMNPQRSTUVWXYZ23456789-_+=?/\\',
+  b41:   'ABCDEFGHJKLMNPQRSTUVWXYZ23456789-_+=?♠♣♥♦',  // b37 + card suits
+  b58:   '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz',
+  b64:   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
+  all:   [...UPPER,...LOWER,...DIGITS,...SYMBOLS,...UNICODE_ALL].join(''),
+  clear: ''
+}
+
+const KNOWN = [
+  {name:'hex',base:16},{name:'b32',base:32},{name:'b37',base:37},
+  {name:'b40',base:40},{name:'b48',base:48},{name:'b52',base:52},
+  {name:'b58',base:58},{name:'b64',base:64},{name:'b85',base:85}
+]
+
+let selected = new Set(PRESETS.b39.split(''))
+
+function cc(base, bytes){ return Math.ceil(bytes * 8 / Math.log2(base)) }
+
+function makeBtn(c){
+  const showWarn = document.getElementById('show-warn').checked
+  const btn = document.createElement('button')
+  const isWarn = WARN.has(c)
+  const isSel  = selected.has(c)
+  btn.className = 'char-btn' + (isSel ? ' selected' : '') + (isWarn ? ' warn-flag' : '')
+  btn.textContent = c === '\\' ? '\\' : c
+  const warnMsg = WARN_REASON[c] || 'Legibility risk after tattoo aging'
+  btn.title = isWarn ? warnMsg : c
+  if(isWarn && showWarn){
+    const dot = document.createElement('span')
+    dot.className = 'warn-dot'
+    btn.appendChild(dot)
+  }
+  btn.onclick = () => {
+    if(selected.has(c)) selected.delete(c); else selected.add(c)
+    refresh()
+  }
+  return btn
+}
+
+function fillGrid(id, chars){
+  const el = document.getElementById(id)
+  el.innerHTML = ''
+  chars.forEach(c => el.appendChild(makeBtn(c)))
+}
+
+// Render the collapsible Unicode groups section
+function renderExtGroups(){
+  const container = document.getElementById('ext-groups-container')
+  if (!container) return
+  // Don't clear — just rebuild buttons in place (groups are static)
+  container.innerHTML = ''
+  UNICODE_GROUPS.forEach(group => {
+    const lbl = document.createElement('div')
+    lbl.className = 'ext-group-label'
+    lbl.textContent = group.label
+    container.appendChild(lbl)
+    const grid = document.createElement('div')
+    grid.className = 'char-grid'
+    group.chars.forEach(c => grid.appendChild(makeBtn(c)))
+    container.appendChild(grid)
+  })
+}
+
+function getAlph(){
+  // Fixed canonical order: ASCII first, then Unicode groups, then any custom pasted chars
+  const fixedOrder = [...UPPER,...LOWER,...DIGITS,...SYMBOLS,...UNICODE_ALL]
+  const fixedSet   = new Set(fixedOrder)
+  // Custom chars added via paste input that aren't in the fixed set
+  const extras = [...selected].filter(c => !fixedSet.has(c))
+  return [...fixedOrder.filter(c => selected.has(c)), ...extras]
+}
+
+function refresh(){
+  fillGrid('grid-upper',   UPPER)
+  fillGrid('grid-lower',   LOWER)
+  fillGrid('grid-digits',  DIGITS)
+  fillGrid('grid-symbols', SYMBOLS)
+  // Re-render Unicode groups only if the section is already open (perf)
+  if (document.getElementById('ext-symbols-section').open) renderExtGroups()
+  const alph = getAlph()
+  const base = alph.length
+  document.getElementById('stat-base').textContent = base
+  if(base >= 2){
+    document.getElementById('stat-nosalt').textContent = cc(base, 64)
+    document.getElementById('stat-salt').textContent   = cc(base, 80)
+    document.getElementById('stat-bits').textContent   = Math.log2(base).toFixed(2)
+  } else {
+    ['stat-nosalt','stat-salt','stat-bits'].forEach(id => document.getElementById(id).textContent = '—')
+  }
+  document.getElementById('alph-preview').textContent = alph.join('') || '(none selected)'
+  rebuildCompare()
+}
+
+function rebuildCompare(){
+  const alph = getAlph()
+  const base = alph.length
+  const rows = [...KNOWN]
+  const exists = rows.find(r => r.base === base)
+  if(base >= 2 && !exists) rows.push({name:`custom b${base}`, base, custom:true})
+  rows.sort((a,b) => a.base - b.base)
+  const maxNs = Math.max(...rows.map(r => cc(r.base, 64)))
+  const tbody = document.getElementById('compare-body')
+  tbody.innerHTML = ''
+  rows.forEach(r => {
+    const ns = cc(r.base, 64), s = cc(r.base, 80)
+    const isCur = r.custom || r.base === base
+    const barW  = Math.round((1 - ns / maxNs) * 70 + 30)
+    const tr = document.createElement('tr')
+    if(isCur) tr.className = 'current'
+    tr.innerHTML = `
+      <td>${r.name}${isCur && !r.custom ? ' <span style="font-size:11px;opacity:.6">(current)</span>' : ''}</td>
+      <td>${r.base}</td><td>${ns}</td><td>${s}</td>
+      <td><div class="bar-bg"><div class="bar-fill" style="width:${barW}%"></div></div></td>`
+    tbody.appendChild(tr)
+  })
+}
+
+function showTab(name, el){
+  document.querySelectorAll('[id^=tab-]').forEach(e => e.style.display = 'none')
+  document.getElementById('tab-' + name).style.display = 'block'
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  el.classList.add('active')
+  if(name === 'compare') rebuildCompare()
+}
+
+function loadPreset(name){
+  const str = PRESETS[name] || ''
+  // Split preserving full Unicode code points (not UTF-16 surrogates)
+  selected = new Set([...str].filter(Boolean))
+  if(name === 'all') [...UPPER,...LOWER,...DIGITS,...SYMBOLS,...UNICODE_ALL].forEach(c => selected.add(c))
+  refresh()
+}
+
+function genExport(){
+  const alph = getAlph()
+  const base = alph.length
+  if(base < 2){ alert('Select at least 2 characters.'); return }
+  const alphStr = alph.join('').replace(/'/g, "\\'")
+  // Characters that are unsafe in batch echo (redirect/pipe/escape operators)
+  const needsPs1 = /[<>|&()^!]/.test(alph.join(''))
+  let code
+  if(needsPs1){
+    code =
+`:: b${base} encode — uses temp ps1 due to special chars in alphabet
+:encode_custom
+set "ps1=%temp%\\sv_cenc.ps1"
+(
+echo $raw=[IO.File]::ReadAllBytes('%~1'^)
+echo $alph='${alphStr}'
+echo $sentinel=[byte[]]@(1^)+$raw
+echo [array]::Reverse($sentinel^)
+echo $n=[Numerics.BigInteger]::new($sentinel^)
+echo $res=''
+echo while($n -gt 0^){$r=0;$n=[Numerics.BigInteger]::DivRem($n,${base},[ref]$r^);$res=$alph[[int]$r]+$res}
+echo [IO.File]::WriteAllText('%~2',$res,[Text.Encoding]::ASCII^)
+) > "!ps1!"
+powershell -NoProfile -ExecutionPolicy Bypass -File "!ps1!"
+del "!ps1!" 2>nul
+exit /b
+
+:: b${base} decode — uses temp ps1
+:decode_custom
+set "ps1=%temp%\\sv_cdec.ps1"
+(
+echo $s=[IO.File]::ReadAllText('%~1'^).Trim(^)
+echo $alph='${alphStr}'
+echo $n=[Numerics.BigInteger]::Zero
+echo foreach($c in $s.ToCharArray(^)^){$v=$alph.IndexOf($c^);if($v -ge 0^){$n=$n*${base}+$v}}
+echo $b=$n.ToByteArray(^)
+echo if($b.Length -gt 0 -and $b[-1] -eq 0^){$b=$b[0..($b.Length-2^)]}
+echo [array]::Reverse($b^)
+echo $b=$b[1..($b.Length-1^)]
+echo [IO.File]::WriteAllBytes('%~2',$b^)
+) > "!ps1!"
+powershell -NoProfile -ExecutionPolicy Bypass -File "!ps1!"
+del "!ps1!" 2>nul
+exit /b`
+  } else {
+    code =
+`:: b${base} encode
+:encode_custom
+powershell -NoProfile -Command ^
+    "$raw=[IO.File]::ReadAllBytes('%~1');" ^
+    "$alph='${alphStr}';" ^
+    "$sentinel=[byte[]]@(1)+$raw;" ^
+    "[array]::Reverse($sentinel);" ^
+    "$n=[Numerics.BigInteger]::new($sentinel);" ^
+    "$res='';" ^
+    "while($n -gt 0){$r=0;$n=[Numerics.BigInteger]::DivRem($n,${base},[ref]$r);$res=$alph[[int]$r]+$res};" ^
+    "[IO.File]::WriteAllText('%~2',$res,[Text.Encoding]::ASCII)"
+exit /b
+
+:: b${base} decode
+:decode_custom
+powershell -NoProfile -Command ^
+    "$s=[IO.File]::ReadAllText('%~1').Trim();" ^
+    "$alph='${alphStr}';" ^
+    "$n=[Numerics.BigInteger]::Zero;" ^
+    "foreach($c in $s.ToCharArray()){$v=$alph.IndexOf($c);if($v -ge 0){$n=$n*${base}+$v}};" ^
+    "$b=$n.ToByteArray();" ^
+    "if($b.Length -gt 0 -and $b[-1] -eq 0){$b=$b[0..($b.Length-2)]};" ^
+    "[array]::Reverse($b);" ^
+    "$b=$b[1..($b.Length-1)];" ^
+    "[IO.File]::WriteAllBytes('%~2',$b)"
+exit /b`
+  }
+  const box = document.getElementById('output-box')
+  box.textContent = code
+  box.style.display = 'block'
+}
+
+function copyAlph(){
+  const alph = getAlph().join('')
+  if(!alph){ alert('No characters selected.'); return }
+  navigator.clipboard.writeText(alph).then(() => {
+    const btn = event.target
+    const orig = btn.textContent
+    btn.textContent = 'Copied!'
+    setTimeout(() => btn.textContent = orig, 1500)
+  })
+}
+
+async function sha256hex(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('')
+}
+
+async function buildEntry(){
+  const alph = getAlph()
+  const base = alph.length
+  if(base < 2){ alert('Select at least 2 characters.'); return null }
+  const alphStr = alph.join('')
+
+  const name = prompt('Alphabet name (shown in menus):\ne.g. "My Tattoo b43"')
+  if(!name || !name.trim()) return null
+
+  const suggestedId = name.trim().toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_]/g,'')
+  const id = prompt('Alphabet ID (short, no spaces, unique):', suggestedId)
+  if(!id || !id.trim()) return null
+  if(/\s/.test(id)){ alert('ID cannot contain spaces.'); return null }
+
+  const notes = prompt('Notes (optional — recovery instructions, tattoo location, etc.):') || ''
+  const fp = (await sha256hex(alphStr)).substring(0, 8)
+
+  return {
+    id:          id.trim(),
+    name:        name.trim(),
+    chars:       alphStr,
+    base:        base,
+    engine:      'bigint',
+    builtin:     false,
+    fingerprint: fp,
+    notes:       notes
+  }
+}
+
+async function saveToLibrary(){
+  const entry = await buildEntry()
+  if(!entry) return
+  // Use pywebview bridge if available, otherwise fall back to download
+  if(window.pywebview && window.pywebview.api && window.pywebview.api.save_alphabet){
+    try {
+      const r = await window.pywebview.api.save_alphabet(entry)
+      const box = document.getElementById('output-box')
+      if(r.ok){
+        box.textContent = `Saved to library: ${entry.id}\nFingerprint: ${entry.fingerprint}\nBase: ${entry.base}\nChars: ${entry.chars}\n\nIt is now available in the Encode and Decode tabs.`
+        box.style.display = 'block'
+        // Notify parent window (if iframe) so Library tab refreshes
+        try { window.parent && window.parent.postMessage({type:'alphabet-saved', entry}, '*') } catch(e){}
+      } else {
+        box.textContent = 'Save failed: ' + (r.error || 'unknown error')
+        box.style.display = 'block'
+      }
+    } catch(e){
+      const box = document.getElementById('output-box')
+      box.textContent = 'Save error: ' + e
+      box.style.display = 'block'
+    }
+  } else {
+    // Standalone mode: fall back to .svlib download
+    downloadSvlibFromEntry(entry)
+  }
+}
+
+async function downloadSvlib(){
+  const entry = await buildEntry()
+  if(!entry) return
+  downloadSvlibFromEntry(entry)
+}
+
+function downloadSvlibFromEntry(entry){
+  const svlib = { entry }
+  const json  = JSON.stringify(svlib, null, 2)
+  const blob  = new Blob([json], { type: 'application/json' })
+  const a     = document.createElement('a')
+  a.href      = URL.createObjectURL(blob)
+  a.download  = entry.id + '.svlib'
+  a.click()
+
+  const box = document.getElementById('output-box')
+  box.textContent = `Downloaded: ${entry.id}.svlib\nFingerprint: ${entry.fingerprint}\nBase: ${entry.base}\nChars: ${entry.chars}\n\nDrag the .svlib file onto sv_import.bat or use Library -> Import to add it.`
+  box.style.display = 'block'
+}
+
+refresh()
+
+// Extended symbols: render groups when section is first opened
+document.getElementById('ext-symbols-section').addEventListener('toggle', function(){
+  if (this.open) renderExtGroups()
+})
+
+// Custom character paste/add button
+document.getElementById('ext-custom-add').addEventListener('click', function(){
+  const input = document.getElementById('ext-custom-input')
+  // Use spread to get full Unicode code points (handles surrogate pairs)
+  const chars = [...input.value.trim()]
+  if (chars.length === 0) { alert('Type or paste a symbol first.'); return }
+  if (chars.length > 1) { alert('Please add one symbol at a time.'); return }
+  const c = chars[0]
+  // Reject plain ASCII (already covered by the main grids)
+  if (c.charCodeAt(0) < 128) { alert('That character is already in the main grid above.'); return }
+  // Reject multi-codepoint sequences (emoji with skin tones, flags, etc.)
+  if ([...c].length > 1) { alert('Multi-part characters (e.g. emoji with modifiers) are not supported.'); return }
+  selected.add(c)
+  input.value = ''
+  if (document.getElementById('ext-symbols-section').open) renderExtGroups()
+  refresh()
+  // Flash the preview to confirm
+  const preview = document.getElementById('alph-preview')
+  preview.style.outline = '2px solid var(--color-border-info)'
+  setTimeout(() => preview.style.outline = '', 800)
+})
+
+// Also trigger add on Enter key in the input
+document.getElementById('ext-custom-input').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') document.getElementById('ext-custom-add').click()
+})
+</script>
+</body>
+</html>

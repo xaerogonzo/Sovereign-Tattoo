@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='utf8'?>
+<nuitka-compilation-report nuitka_version="4.1" nuitka_commercial_version="not installed" mode="standalone" completion="error exit message (1)" exit_message="pywebview: Conflict between user and plugin decision for module 'webview.platforms.android'.">
+  <performance>
+    <memory_usage name="after_launch" value="45469696" />
+  </performance>
+  <data_file name="sv_core.ps1" source="${cwd}\sv_core.ps1" size="17965" reason="specified data file 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\sv_core.ps1=sv_core.ps1' on command line" tags="user,copy" />
+  <data_file name="data\sv_lib.json" source="${cwd}\data\sv_lib.json" size="2712" reason="specified data file 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\data\sv_lib.json=data/sv_lib.json' on command line" tags="user,copy" />
+  <data_file name="gui\alphabet_editor.html" source="${cwd}\gui\alphabet_editor.html" size="29785" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\index.html" source="${cwd}\gui\index.html" size="56108" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\css\sovereign.css" source="${cwd}\gui\css\sovereign.css" size="39248" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\fonts\DejaVuSansMono.ttf" source="${cwd}\gui\fonts\DejaVuSansMono.ttf" size="340712" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\fonts\LICENSE.txt" source="${cwd}\gui\fonts\LICENSE.txt" size="8816" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\js\app.js" source="${cwd}\gui\js\app.js" size="9225" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\js\decode.js" source="${cwd}\gui\js\decode.js" size="17065" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\js\encode.js" source="${cwd}\gui\js\encode.js" size="22859" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\js\help.js" source="${cwd}\gui\js\help.js" size="1436" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\js\library.js" source="${cwd}\gui\js\library.js" size="3263" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\js\settings.js" source="${cwd}\gui\js\settings.js" size="8813" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\js\tattoo.js" source="${cwd}\gui\js\tattoo.js" size="50370" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="gui\js\vault.js" source="${cwd}\gui\js\vault.js" size="10941" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui' on command line" tags="user,copy,data-dir-contents" />
+  <data_file name="bin\README.md" source="${cwd}\bin\README.md" size="2395" reason="specified data dir 'D:\Random Projects\Sovereign Tattoo\Tattoo Project\bin' on command line" tags="user,copy,data-dir-contents" />
+  <data_composer blob_size="None" />
+  <performance-totals>
+    <optimization-time pass="all" time="0.0000" module_count="0" />
+    <code-generation-time time="0.0000" module_count="0" />
+  </performance-totals>
+  <python_binary filename="sovereign_gui.exe" />
+  <command_line>
+    <option value="--standalone" />
+    <option value="--enable-plugin=tk-inter" />
+    <option value="--include-package=PIL" />
+    <option value="--include-package=keyring" />
+    <option value="--include-package=webview" />
+    <option value="--nofollow-import-to=tkinter" />
+    <option value="--windows-console-mode=disable" />
+    <option value="--include-data-file=D:\Random Projects\Sovereign Tattoo\Tattoo Project\sv_core.ps1=sv_core.ps1" />
+    <option value="--include-data-file=D:\Random Projects\Sovereign Tattoo\Tattoo Project\data\sv_lib.json=data/sv_lib.json" />
+    <option value="--include-data-dir=D:\Random Projects\Sovereign Tattoo\Tattoo Project\gui=gui" />
+    <option value="--include-data-dir=D:\Random Projects\Sovereign Tattoo\Tattoo Project\bin=bin" />
+    <option value="--include-package=pytesseract" />
+    <option value="--output-dir=D:\Random Projects\Sovereign Tattoo\Tattoo Project\dist" />
+    <option value="--remove-output" />
+    <option value="D:\Random Projects\Sovereign Tattoo\Tattoo Project\sovereign_gui.py" />
+  </command_line>
+  <plugins>
+    <plugin name="anti-bloat" user_enabled="no" />
+    <plugin name="data-files" user_enabled="no" />
+    <plugin name="delvewheel" user_enabled="no" />
+    <plugin name="dll-files" user_enabled="no" />
+    <plugin name="gevent" user_enabled="no" />
+    <plugin name="gi" user_enabled="no" />
+    <plugin name="glfw" user_enabled="no" />
+    <plugin name="implicit-imports" user_enabled="no" />
+    <plugin name="kivy" user_enabled="no" />
+    <plugin name="matplotlib" user_enabled="no" />
+    <plugin name="multiprocessing" user_enabled="no" />
+    <plugin name="options-nanny" user_enabled="no" />
+    <plugin name="pbr-compat" user_enabled="no" />
+    <plugin name="pkg-resources" user_enabled="no" />
+    <plugin name="playwright" user_enabled="no" />
+    <plugin name="pywebview" user_enabled="no" />
+    <plugin name="spacy" user_enabled="no" />
+    <plugin name="tk-inter" user_enabled="yes" />
+    <plugin name="torch-jit" user_enabled="no" />
+    <plugin name="transformers" user_enabled="no" />
+  </plugins>
+  <distributions />
+  <python python_exe="${sys.prefix}\python.exe" python_flavor="Anaconda Python" python_version="3.13.12" os_name="Windows" os_release="11" arch_name="x86_64" filesystem_encoding="utf-8" gil="yes">
+    <search_path>
+      <path value="${cwd}" />
+      <path value="${sys.prefix}\DLLs" />
+      <path value="${sys.prefix}\Lib" />
+      <path value="${sys.prefix}" />
+      <path value="${sys.prefix}\Lib\site-packages" />
+      <path value="${sys.prefix}\Lib\site-packages\setuptools\_vendor" />
+    </search_path>
+  </python>
+  <output run_filename="${cwd}\dist\sovereign_gui.dist\sovereign_gui.exe" />
+</nuitka-compilation-report>
