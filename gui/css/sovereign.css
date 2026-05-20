@@ -1487,6 +1487,76 @@ kbd {
 }
 .tlog-photo-thumb:hover .remove-photo-btn { opacity: 1; }
 
+/* Ask Claude button on photo thumbnails */
+.ask-claude-btn {
+  position: absolute;
+  bottom: 3px; left: 3px; right: 3px;
+  background: rgba(99,102,241,0.85);
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tlog-photo-thumb:hover .ask-claude-btn { opacity: 1; }
+
+/* Claude Vision panel */
+.claude-vision-panel {
+  margin-top: 16px;
+  background: var(--bg-elevated, #1a2332);
+  border: 1px solid var(--border-color, #2a3a4a);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.claude-vision-panel.hidden { display: none; }
+.claude-vision-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.claude-vision-title { font-weight: 600; font-size: 14px; }
+.claude-vision-photo-name { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+.claude-vision-textarea {
+  width: 100%; min-height: 72px; resize: vertical;
+  margin-top: 4px; box-sizing: border-box;
+}
+.claude-vision-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.claude-vision-chips .chip {
+  background: var(--bg-elevated-2, #0d1b2a);
+  border: 1px solid var(--border-color, #2a3a4a);
+  border-radius: 12px; padding: 3px 10px;
+  font-size: 11px; color: var(--text-muted);
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+}
+.claude-vision-chips .chip:hover {
+  background: var(--accent, #3b82f6);
+  color: #fff; border-color: var(--accent, #3b82f6);
+}
+.claude-vision-response {
+  margin-top: 12px;
+  background: var(--bg-elevated-2, #0d1b2a);
+  border: 1px solid var(--border-color, #2a3a4a);
+  border-radius: var(--radius-sm); padding: 12px;
+  font-size: 13px; line-height: 1.6;
+  max-height: 400px; overflow-y: auto;
+}
+.claude-vision-response p { margin: 0 0 8px 0; }
+.claude-vision-response p:last-of-type { margin-bottom: 4px; }
+.claude-vision-model {
+  margin-top: 8px; padding-top: 6px;
+  border-top: 1px solid var(--border-color, #2a3a4a);
+}
+.claude-vision-response.hidden { display: none; }
+.error-text { color: var(--color-danger, #f87171); }
+
 /* Linked key record section */
 .kr-link-section {
   background: var(--bg-elevated-2, #0d1b2a);

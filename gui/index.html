@@ -878,6 +878,34 @@
       <div class="col"></div>
     </div>
 
+    <!-- AI Features -->
+    <div class="engines-section">
+      <div class="engines-header">
+        <h2>AI Features</h2>
+      </div>
+      <p class="muted small">
+        Claude Vision lets you upload a tattoo photo and ask Claude for design
+        suggestions. Requires an Anthropic API key (get one at
+        <a href="#" id="anthropic-link" data-url="https://console.anthropic.com/">console.anthropic.com</a>).
+        The key is stored in Windows Credential Manager — never written to disk.
+      </p>
+      <div class="row">
+        <div class="col">
+          <label class="field-label">Anthropic API key</label>
+          <div class="input-with-toggle">
+            <input type="password" id="set-anthropic-key" class="input"
+                   placeholder="sk-ant-api03-…" autocomplete="off">
+          </div>
+          <div style="margin-top:6px;display:flex;gap:8px;align-items:center">
+            <button class="btn small" id="set-anthropic-save">Save key</button>
+            <button class="btn ghost small" id="set-anthropic-clear">Remove</button>
+            <span id="set-anthropic-status" class="muted small"></span>
+          </div>
+        </div>
+        <div class="col"></div>
+      </div>
+    </div>
+
     <!-- Compression engines -->
     <div class="engines-section">
       <div class="engines-header">

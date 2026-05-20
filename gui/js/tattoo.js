@@ -589,6 +589,14 @@ Tabs.tattoo = (() => {
       name.textContent = rel.split(/[\\/]/).pop();
       wrap.appendChild(name);
 
+      // Ask Claude button
+      const claudeBtn = document.createElement('button');
+      claudeBtn.className = 'ask-claude-btn';
+      claudeBtn.textContent = '✨ Ask Claude';
+      claudeBtn.title = 'Send this photo to Claude for design suggestions';
+      claudeBtn.addEventListener('click', () => openClaudePanel(idx, rel));
+      wrap.appendChild(claudeBtn);
+
       const removeBtn = document.createElement('button');
       removeBtn.className = 'remove-photo-btn'; removeBtn.textContent = '×';
       removeBtn.title = 'Remove photo';
@@ -597,6 +605,90 @@ Tabs.tattoo = (() => {
 
       elEdPhotosWrap.insertBefore(wrap, elEdPhotosEmpty);
     });
+  }
+
+  // ── Claude Vision panel ────────────────────────────────────────────────────
+
+  let claudePanelIdx = null;
+
+  function openClaudePanel(photoIdx, relPath) {
+    claudePanelIdx = photoIdx;
+    const fname = relPath.split(/[\\/]/).pop();
+
+    // Reuse or create the panel
+    let panel = document.getElementById('claude-vision-panel');
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.id = 'claude-vision-panel';
+      panel.className = 'claude-vision-panel';
+      panel.innerHTML = `
+        <div class="claude-vision-header">
+          <span class="claude-vision-title">✨ Ask Claude about this photo</span>
+          <button class="btn-icon" id="claude-vision-close" title="Close">×</button>
+        </div>
+        <div class="claude-vision-photo-name" id="claude-vision-fname"></div>
+        <label class="field-label" style="margin-top:10px">What would you like to know or change?</label>
+        <textarea id="claude-vision-prompt" class="input claude-vision-textarea"
+          placeholder="e.g. How could I modify this to add more geometric elements? What style would complement this? How would a coverup work here?"></textarea>
+        <div class="claude-vision-chips">
+          <button class="chip" data-prompt="Suggest ways to modify or extend this tattoo design.">Suggest modifications</button>
+          <button class="chip" data-prompt="What tattoo style does this appear to be, and what complementary styles could work well with it?">Style advice</button>
+          <button class="chip" data-prompt="How well healed does this tattoo look, and what aftercare or touch-up advice would you give?">Healing & touch-up</button>
+          <button class="chip" data-prompt="If someone wanted to cover this tattoo up, what designs or approaches would work best?">Cover-up options</button>
+          <button class="chip" data-prompt="What ink colors would complement or contrast well with this design?">Color suggestions</button>
+        </div>
+        <button class="btn primary" id="claude-vision-send" style="margin-top:10px">Send to Claude</button>
+        <div id="claude-vision-response" class="claude-vision-response hidden"></div>
+      `;
+      document.querySelector('.tattoo-editor-panel').appendChild(panel);
+
+      panel.querySelector('#claude-vision-close').addEventListener('click', closeClaudePanel);
+
+      // Chip → fill prompt textarea
+      panel.querySelectorAll('.chip[data-prompt]').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.getElementById('claude-vision-prompt').value = chip.dataset.prompt;
+        });
+      });
+
+      panel.querySelector('#claude-vision-send').addEventListener('click', sendToClaudeVision);
+    }
+
+    panel.querySelector('#claude-vision-fname').textContent = fname;
+    panel.querySelector('#claude-vision-prompt').value = '';
+    panel.querySelector('#claude-vision-response').classList.add('hidden');
+    panel.querySelector('#claude-vision-response').innerHTML = '';
+    panel.classList.remove('hidden');
+  }
+
+  function closeClaudePanel() {
+    const panel = document.getElementById('claude-vision-panel');
+    if (panel) panel.classList.add('hidden');
+  }
+
+  async function sendToClaudeVision() {
+    if (!editingId || claudePanelIdx === null) return;
+    const prompt = document.getElementById('claude-vision-prompt').value.trim();
+    const sendBtn = document.getElementById('claude-vision-send');
+    const responseEl = document.getElementById('claude-vision-response');
+
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Asking Claude…';
+    responseEl.classList.remove('hidden');
+    responseEl.innerHTML = '<span class="muted">Sending photo to Claude Vision…</span>';
+
+    const r = await App.api('tattoo_analyze_photo', editingId, claudePanelIdx, prompt);
+
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Send to Claude';
+
+    if (r.ok) {
+      // Render markdown line-breaks as <br> for basic formatting
+      const formatted = escapeHtml(r.response).replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+      responseEl.innerHTML = `<p>${formatted}</p><div class="claude-vision-model muted small">Model: ${escapeHtml(r.model)}</div>`;
+    } else {
+      responseEl.innerHTML = `<span class="error-text">${escapeHtml(r.error)}</span>`;
+    }
   }
 
   async function onAddPhoto() {

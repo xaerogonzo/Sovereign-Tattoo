@@ -12,10 +12,18 @@ Tabs.settings = (() => {
     document.getElementById('set-tesseract-browse').addEventListener('click', browseTesseract);
     document.getElementById('set-engines-refresh').addEventListener('click', refreshEngines);
     document.getElementById('set-engines-open-bin').addEventListener('click', openBinFolder);
+    document.getElementById('set-anthropic-save').addEventListener('click', saveAnthropicKey);
+    document.getElementById('set-anthropic-clear').addEventListener('click', clearAnthropicKey);
+    document.getElementById('anthropic-link').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await App.api('copy_to_clipboard', 'https://console.anthropic.com/');
+      App.toast('URL copied to clipboard', 'info', 1800);
+    });
     App.bindSegmented('set-default-fpsize');
     App.bindSegmented('set-default-salt');
     App.bindSegmented('set-default-compression');
     await refreshEngines();
+    await refreshAnthropicStatus();
   }
 
   async function populate() {
@@ -204,6 +212,43 @@ Tabs.settings = (() => {
     if (r.ok && r.bin_dir) await App.api('open_folder', r.bin_dir);
   }
 
+  // =========================================================================
+  // Anthropic API key (Windows Credential Manager)
+  // =========================================================================
+
+  async function refreshAnthropicStatus() {
+    const statusEl = document.getElementById('set-anthropic-status');
+    const r = await App.api('get_anthropic_key_status');
+    if (r.ok && r.configured) {
+      statusEl.textContent = 'Key saved in Credential Manager';
+      statusEl.style.color = 'var(--color-success, #4ade80)';
+    } else {
+      statusEl.textContent = 'Not configured';
+      statusEl.style.color = '';
+    }
+  }
+
+  async function saveAnthropicKey() {
+    const key = document.getElementById('set-anthropic-key').value.trim();
+    if (!key) { App.toast('Enter an API key first', 'error'); return; }
+    const r = await App.api('save_anthropic_key', key);
+    if (r.ok) {
+      document.getElementById('set-anthropic-key').value = '';
+      App.toast('API key saved to Credential Manager', 'success');
+      await refreshAnthropicStatus();
+    } else {
+      App.toast('Save failed: ' + r.error, 'error', 4500);
+    }
+  }
+
+  async function clearAnthropicKey() {
+    const ok = await App.confirm('Remove API key?', 'This will delete the Anthropic API key from Windows Credential Manager. Claude Vision features will stop working.');
+    if (!ok) return;
+    await App.api('delete_anthropic_key');
+    App.toast('API key removed', 'success');
+    await refreshAnthropicStatus();
+  }
+
   function esc(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -211,5 +256,5 @@ Tabs.settings = (() => {
   }
   function escA(s) { return esc(s).replace(/"/g, '&quot;'); }
 
-  return { init, onShow: () => { populate(); refreshEngines(); } };
+  return { init, onShow: () => { populate(); refreshEngines(); refreshAnthropicStatus(); } };
 })();

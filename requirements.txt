@@ -5,6 +5,10 @@ pywebview>=5,<6        # Edge WebView2 embedding for the GUI shell
 keyring>=24            # Windows Credential Manager wrapper
 Pillow>=10             # PNG export in the Tattoo Studio + image manipulation
 
+# Optional — Claude Vision AI tattoo analysis (Settings → AI Features).
+# Requires an Anthropic API key stored in Windows Credential Manager.
+anthropic>=0.25            # Claude Vision API for tattoo photo analysis
+
 # Optional — only needed if you want Tesseract OCR in the Tattoo tab.
 # The Tesseract binary itself must be installed separately from
 # https://github.com/UB-Mannheim/tesseract/wiki (Windows installer).

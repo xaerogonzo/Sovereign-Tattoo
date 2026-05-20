@@ -4,16 +4,26 @@ tattoo_log_api.py — TattooLogApiMixin
 Exposes CRUD for the personal tattoo dossier (sv_tattoo_log.json).
 This layer is the *aesthetic wrapper*: photos, placement, artist info, status.
 It never reads or writes sv_key_records.json.
+
+Also exposes tattoo_analyze_photo() which uses Claude Vision to analyse a
+stored photo and return AI suggestions based on a user-supplied prompt.
+The Anthropic API key is read from Windows Credential Manager at call time —
+it is never stored in settings JSON or logged.
 """
 
 from __future__ import annotations
 
+import base64
 import shutil
 from pathlib import Path
 from typing import Any
 
+import keyring
 import sv_tattoo_log
 from api._helpers import _tattoo_dirs
+
+_ANTHROPIC_SERVICE = 'sovereign-tattoo-config'
+_ANTHROPIC_USER    = 'anthropic_api_key'
 
 
 class TattooLogApiMixin:
@@ -210,5 +220,101 @@ class TattooLogApiMixin:
             if entry is None:
                 return {'ok': False, 'error': f'Entry {entry_id!r} not found'}
             return {'ok': True, 'entry': entry}
+        except Exception as exc:
+            return {'ok': False, 'error': str(exc)}
+
+    # ---------------------------------------------------- Claude Vision analysis
+
+    def tattoo_analyze_photo(
+        self,
+        entry_id: str,
+        photo_idx: int,
+        prompt: str,
+    ) -> dict[str, Any]:
+        """
+        Send a stored tattoo photo to Claude Vision with *prompt* and return
+        the AI's suggestions.
+
+        The Anthropic API key is read from Windows Credential Manager at call
+        time — it is never stored in settings JSON or passed from JS.
+
+        Returns {ok, response, model} on success, or {ok:False, error} on
+        failure (including missing API key, missing file, or API error).
+        """
+        try:
+            # 1. Resolve photo path
+            entry = sv_tattoo_log.get_entry(entry_id)
+            if entry is None:
+                return {'ok': False, 'error': f'Entry {entry_id!r} not found'}
+            photos = entry.get('photos', [])
+            if not (0 <= photo_idx < len(photos)):
+                return {'ok': False, 'error': f'Photo index {photo_idx} out of range'}
+            dirs = _tattoo_dirs()
+            img_path = dirs['vault_root'] / photos[photo_idx]
+            if not img_path.exists():
+                return {'ok': False, 'error': f'Photo file not found: {img_path}'}
+
+            # 2. Read + base64-encode the image
+            img_bytes = img_path.read_bytes()
+            img_b64   = base64.standard_b64encode(img_bytes).decode('ascii')
+            suffix    = img_path.suffix.lower().lstrip('.')
+            media_map = {'jpg': 'image/jpeg', 'jpeg': 'image/jpeg',
+                         'png': 'image/png',  'gif': 'image/gif',
+                         'webp': 'image/webp'}
+            media_type = media_map.get(suffix, 'image/jpeg')
+
+            # 3. Get API key from Credential Manager
+            api_key = keyring.get_password(_ANTHROPIC_SERVICE, _ANTHROPIC_USER)
+            if not api_key:
+                return {
+                    'ok': False,
+                    'error': 'Anthropic API key not configured. Go to Settings → AI Features to add it.',
+                }
+
+            # 4. Call Claude Vision
+            try:
+                import anthropic
+            except ImportError:
+                return {
+                    'ok': False,
+                    'error': 'anthropic package not installed. Run: pip install anthropic',
+                }
+
+            client = anthropic.Anthropic(api_key=api_key)
+            model  = 'claude-opus-4-5'
+
+            system_msg = (
+                'You are a professional tattoo design consultant with expertise in '
+                'tattoo artistry, body placement, healing, and modification. '
+                'When analysing a tattoo photo, give practical, specific, and '
+                'thoughtful suggestions. Be honest but constructive.'
+            )
+
+            user_prompt = (prompt or '').strip() or \
+                'Analyse this tattoo and suggest how it could be modified or improved.'
+
+            message = client.messages.create(
+                model=model,
+                max_tokens=1024,
+                system=system_msg,
+                messages=[{
+                    'role': 'user',
+                    'content': [
+                        {
+                            'type': 'image',
+                            'source': {
+                                'type': 'base64',
+                                'media_type': media_type,
+                                'data': img_b64,
+                            },
+                        },
+                        {'type': 'text', 'text': user_prompt},
+                    ],
+                }],
+            )
+
+            response_text = message.content[0].text if message.content else ''
+            return {'ok': True, 'response': response_text, 'model': model}
+
         except Exception as exc:
             return {'ok': False, 'error': str(exc)}
