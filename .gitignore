@@ -1,1 +1,40 @@
-.tokensave
+# ── Claude Code internal state ─────────────────────────────────────────────
+# Session history, plans, hooks — machine-local, never share
+.claude/
+
+# ── TokenSave code graph ────────────────────────────────────────────────────
+.tokensave/
+
+# ── Nuitka build output ─────────────────────────────────────────────────────
+dist/
+*.build/
+*.dist/
+*.onefile-build/
+nuitka-crash-report.xml
+
+# ── Python bytecode ─────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ── User runtime data — personal records, never commit ──────────────────────
+# sv_lib.json IS committed (it's the shipped alphabet library).
+# Everything else under data/ is generated at runtime for the local user.
+data/sv_key_records.json
+data/sv_keyring_index.json
+data/sv_tattoo_log.json
+data/sovereign_gui.cfg
+
+# Atomic-write temp files (should never persist, but just in case)
+*.json.tmp
+*.cfg.tmp
+
+# ── Virtual environments ─────────────────────────────────────────────────────
+.venv*/
+venv/
+.env
+
+# ── Windows noise ───────────────────────────────────────────────────────────
+Thumbs.db
+desktop.ini
