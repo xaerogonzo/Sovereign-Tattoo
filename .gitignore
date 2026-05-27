@@ -38,3 +38,96 @@ venv/
 # ── Windows noise ───────────────────────────────────────────────────────────
 Thumbs.db
 desktop.ini
+
+# Added by TokenSave Manager
+scripts/build.py
+scripts/build.bat
+
+# Added by TokenSave Manager
+*.local.json
+.codegraph/codegraph.db
+.codegraph/codegraph.db-*
+build/
+.venv/
+logs/
+.DS_Store
+.pr_context.tmp.md
+PR_DRAFT.md
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+htmlcov/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.next/
+out/
+target/
+**/*.rs.bk
+# AI suggested patterns
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.orig
+*.rej
+*.so
+*.dll
+*.exe
+*.bat
+*.sh
+*.ps1
+*.cmd
+*.pdb
+*.dist-info/
+*.whl
+*.venv/
+
+# Added by TokenSave Manager
+# AI suggested patterns
+*.md~
+*.ps1~
+*.py~
+*.txt~
+*.xml~
+*.bak~
+*.tmp~
+*.log~
+*.orig~
+*.rej~
+*.swp~
+*.swo~
+*.DS_Store~
+*.env~
+*.venv~
+*.pytest_cache~
+*.mypy_cache~
+*.tox~
+
+# Added by TokenSave Manager
+# AI suggested patterns
+*.bat~
+*.cfg~
+
+# Added by TokenSave Manager
+# AI suggested patterns
+*.cmd~
+*.dll~
+*.exe~
+*.json.tmp~
+*.pdb~
+*.pyc~
+*.pyd~
+*.pyo~
+*.sh~
+*.so~
+*.whl~
+.DS_Store~
+data/sovereign_gui.cfg~
+data/sv_key_records.json~
